@@ -41,17 +41,19 @@ app.put('/api/', function(req, res){
     res.send("Collection PUT REQUEST");
 });
 
-//POST COLLECTION
+//POST ITEM
 app.post('/api/', function(req, res){
     console.log('POST Request!')
-    console.log(req.body)
+    //console.log(req.body)
 
-    var date = new Date();
-
-    sql = "INSERT INTO Movies (title, release_year, time_viewed) VALUES (?,?,?)";
-    db.run(sql, [req.body.title, req.body.releaseyear, date.toString()]);
-    
-    res.send("Collection POST REQUEST");
+    try{
+        var date = new Date();
+        sql = "INSERT INTO Movies (title, release_year, time_viewed) VALUES (?,?,?)";
+        db.run(sql, [req.body.title, req.body.releaseyear, date.toString()]);
+        res.send("POST REQUEST SUCCESSFUL");
+    }catch(error){
+        res.sendStatus(500);
+    }
 });
 
 //DELETE COLLECTION
