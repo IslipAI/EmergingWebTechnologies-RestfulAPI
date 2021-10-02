@@ -20,41 +20,70 @@ db.serialize(function(){
     db.run('CREATE TABLE Movies (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, release_year TEXT, time_viewed TEXT)');
 });
 
+
 //Collection API Routers
 //GET COLLECTION
 app.get("/api/", function(req, res){
     console.log("GET Request!");
-
-    db.all("SELECT * FROM Movies", function(error, results){
-        if(error){
-            console.log(error);
-        }else{
-            console.log(results)
-            res.send(results);
-        }
-    });
+    try{
+        db.all("SELECT * FROM Movies", function(error, results){
+            if(error){
+                console.log(error);
+            }else{
+                console.log(results)
+                res.send(results);
+            }
+        });
+    }catch(error){
+        console.log(error);
+        res.sendStatus(500);
+    }
 });
+
 
 //PUT COLLECTION
 app.put('/api/', function(req, res){
-    console.log('PUT Request!')
-    res.send("Collection PUT REQUEST");
-});
-
-//POST ITEM
-app.post('/api/', function(req, res){
-    console.log('POST Request!')
-    //console.log(req.body)
-
     try{
-        var date = new Date();
-        sql = "INSERT INTO Movies (title, release_year, time_viewed) VALUES (?,?,?)";
-        db.run(sql, [req.body.title, req.body.releaseyear, date.toString()]);
-        res.send("POST REQUEST SUCCESSFUL");
+        console.log('PUT Request!')
+        db.serialize(function(){
+             //console.log(req.body);
+            db.run('DELETE FROM Movies', function(error){
+                if(error){
+                    console.log(error);
+                }
+            });
+
+            db.run("delete from sqlite_sequence where name='Movies'");
+
+            var collection = req.body;
+            sql = "INSERT INTO Movies (title, release_year, time_viewed) VALUES (?,?,?)";
+
+            for(var i = 0; i < collection.length; i++){
+                var date = new Date();
+                db.run(sql, [collection[i].title, collection[i].release_year, date.toString()]);
+            }
+            res.send("REPLACE COLLECTION SUCCESSFUL");
+        });
     }catch(error){
         res.sendStatus(500);
     }
 });
+
+
+//POST COLLECTION
+app.post('/api/', function(req, res){
+    try{
+        console.log('POST Request!')
+        //console.log(req.body)
+        var date = new Date();
+        sql = "INSERT INTO Movies (title, release_year, time_viewed) VALUES (?,?,?)";
+        db.run(sql, [req.body.title, req.body.releaseyear, date.toString()]);
+        res.send("CREATE ENTRY SUCCESSFUL");
+    }catch(error){
+        res.sendStatus(500);
+    }
+});
+
 
 //DELETE COLLECTION
 app.delete('/api/', function(req, res){
@@ -66,7 +95,6 @@ app.delete('/api/', function(req, res){
             res.send('DELETE COLLECTION SUCCESSFUL')
         }
     });
-    res.send("Collection DELETE REQUEST");
 });
 
 
@@ -85,6 +113,7 @@ app.get('/api/:id', function(req, res){
     });
 });
 
+
 //PUT ITEM
 app.put('/api/:id', function(req, res){
     console.log('PUT Request!')
@@ -94,10 +123,11 @@ app.put('/api/:id', function(req, res){
         if(error){
             console.log(error);
         }else{
-            res.send("UPDATE ITEM WAS SUCCESSFUL")
+            res.send("UPDATE ITEM SUCCESSFUL")
         }
     });
 });
+
 
 //DELETE ITEM
 app.delete('/api/:id', function(req, res){
@@ -106,7 +136,7 @@ app.delete('/api/:id', function(req, res){
         if(error){
             console.log(error);
         }else{
-            res.send('DELETE ITEM WAS SUCCESSFUL');
+            res.send('DELETE ITEM SUCCESSFUL');
         }
     });
 });
