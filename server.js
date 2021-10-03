@@ -88,7 +88,7 @@ app.post('/api/', function(req, res){
 //DELETE COLLECTION
 app.delete('/api/', function(req, res){
     console.log('DELETE Request!')
-    db.run('DELETE * FROM Movies', function(error){
+    db.run('DELETE FROM Movies', function(error){
         if(error){
             console.log(error);
         }else{

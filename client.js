@@ -4,6 +4,7 @@ const axios = require('axios');
 //Test one function
 async function TestOne(){
     console.log('TEST ONE STARTED...');
+    await ResetCollection();
     var subtestone = await PostRequestTestOne('Now You See Me', 2013);
     var subtesttwo = await PostRequestTestOne('Grown Ups', 2010);
     var subtestthree = await PutRequestTestOne(1, 'Weekend At Bernies', 1989);
@@ -18,6 +19,10 @@ async function TestOne(){
     }else{
         console.log('TEST ONE FAILED')
     }
+}
+
+function ResetCollection(){
+    axios.delete('http://localhost:3000/api/');
 }
 
 
@@ -106,6 +111,7 @@ async function TestTwo(){
         }
     ];
     var subtestone = await PutRequestTestTwo(movies); 
+    var subtesttwo = await GetRequestTestTwo(movies);
 }
 
 function PutRequestTestTwo(collection){
@@ -126,9 +132,8 @@ function PutRequestTestTwo(collection){
 }
 
 function GetRequestTestTwo(expectedcollection){
-    var requeststatus = axios.get('http://localhost:3000/api/')
-    .then(function(response){
-        console.log(response);
+    var requeststatus = axios.get('http://localhost:3000/api/').then(function(response){
+        console.log(response.data);
     })
     .catch(function(error){
         console.log(error);
