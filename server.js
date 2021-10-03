@@ -88,12 +88,15 @@ app.post('/api/', function(req, res){
 //DELETE COLLECTION
 app.delete('/api/', function(req, res){
     console.log('DELETE Request!')
-    db.run('DELETE FROM Movies', function(error){
-        if(error){
-            console.log(error);
-        }else{
-            res.send('DELETE COLLECTION SUCCESSFUL')
-        }
+    db.serialize(function(){
+        db.run('DELETE FROM Movies', function(error){
+            if(error){
+                console.log(error);
+            }else{
+                res.send('DELETE COLLECTION SUCCESSFUL')
+            }
+        });
+        db.run("delete from sqlite_sequence where name='Movies'");
     });
 });
 
