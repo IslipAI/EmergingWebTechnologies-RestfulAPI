@@ -1,95 +1,80 @@
 //Import axios package
 const axios = require('axios');
-const { response } = require('express');
 
+//Global variable for test state.
+let testpass = true;
+let testlocation = '';
 
 //Function calls all Test One subtests.
-async function TestOne(){
-    console.log('TEST ONE STARTED...');
-    var subtestone = await PostRequestTestOne('Now You See Me', 2013);
-    var subtesttwo = await PostRequestTestOne('Grown Ups', 2010);
-    var subtestthree = await PutRequestTestOne(1, 'Weekend At Bernies', 1989);
-    var subtestfour = await GetRequestTestOne(1, 'Weekend At Bernies', 1989);
-    var subtestfive = await GetRequestTestOne(2, 'Grown Ups', 2010);
-    if(subtestone === true &&
-        subtesttwo === true &&
-        subtestthree === true &&
-        subtestfour === true &&
-        subtestfive === true){
-            console.log("TEST ONE SUCCESSFUL");
-    }
+function TestOne(){
+    PostRequestTestOne('Now You See Me', 2013);
+    setTimeout(() =>  PostRequestTestOne('Grown Ups', 2010), 100);
+    setTimeout(() =>  PutRequestTestOne(1, 'Weekend At Bernies', 1989), 200);
+    setTimeout(() =>  GetRequestTestOne(1, 'Weekend At Bernies', 1989), 300);
+    setTimeout(() =>  GetRequestTestOne(2, 'Grown Ups', 2010), 400);
 }
-
 
 //POST request with axios
 //Returns true if response matches CREATE ENTRY SUCCESSFUL.
 function PostRequestTestOne(title, releaseyear){
-    var requeststatus = axios.post('http://localhost:3000/api/', {
+    axios.post('http://localhost:3000/api/', {
         title: title,
         releaseyear: releaseyear, 
     }).then(function(response){
         //console.log(response.data)
         responsestring = response.data.toString();
         if(responsestring === 'CREATE ENTRY SUCCESSFUL'){
-            return true;
+            VerifyTest(true, '1');
         }else{
-            return false;
+            VerifyTest(false, '1');
         }
     }).catch(function(error){
         console.log(error)
-        return false;
     });
-    return requeststatus;
 }
-
 
 //PUT request with axios
 //Returns true if response matches UPDATE ITEM SUCCESSFUL.
 function PutRequestTestOne(id, title, releaseyear){
-    var requeststatus = axios.put('http://localhost:3000/api/' + id.toString() + '/', {
+    axios.put('http://localhost:3000/api/' + id.toString() + '/', {
         title: title,
         releaseyear: releaseyear,
     }).then(function(response){
         //console.log(response.data);
         responsestring = response.data.toString();
         if(responsestring === 'UPDATE ITEM SUCCESSFUL'){
-            return true;
+            VerifyTest(true, '2');
         }else{
-            return false;
+            VerifyTest(false, '2');
         }
     }).catch(function(error){
         console.log(error);
         return false;
     });
-    return requeststatus;
 }
-
 
 //GET request with axios
 //Returns true if request response matches to expected.
 function GetRequestTestOne(id, expectedtitle, expectedreleaseyear){
-    var requeststatus = axios.get('http://localhost:3000/api/' + id.toString() + '/')
+    axios.get('http://localhost:3000/api/' + id.toString() + '/')
     .then(function(response){
-        //console.log(response);
+        //console.log(response.data);
         responsestringtitle = response.data.title.toString();
         responsereleaseyear = response.data.release_year;
         if(responsestringtitle === expectedtitle && responsereleaseyear.toString() === expectedreleaseyear.toString()){
-            return true;
+            VerifyTest(true, '3');
         }else{
-            return false;
+            VerifyTest(false, '3');
         }
     })
     .catch(function(error){
         console.log(error);
-        return false;
     });
-    return requeststatus;
 }
-
 
 //Function calls all Test Two subtests.
 async function TestTwo(){
-    console.log('TEST TWO STARTED...');
+    //Expected list of movies.
     const movies = [
         {
             "title" : "Venom",
@@ -100,17 +85,21 @@ async function TestTwo(){
             "release_year" : 2019
         },
         {
-            "title" : "The Addams Family",
-            "release_year" : 2019
+            "title" : "Interstellar",
+            "release_year" : 2014
         },  
         {
-            "title" : "The Addams Family",
-            "release_year" : 2019
+            "title" : "A Dogs Purpose",
+            "release_year" : 2017
         }
     ];
-    var subtestone = await PutRequestTestTwo(movies); 
-    var subtesttwo = await GetRequestTestTwo(movies);
-    var subtestthree = await DeleteRequestByIdTestTwo(3);
+    PutRequestTestTwo(movies); 
+
+    setTimeout(() => {GetRequestTestTwo(movies)}, 500);
+
+    setTimeout(() => {DeleteRequestByIdTestTwo(3)}, 600);
+
+    //Expected list of movies.
     const moviestwo = [
         {
             "title" : "Venom",
@@ -121,123 +110,128 @@ async function TestTwo(){
             "release_year" : 2019
         }, 
         {
-            "title" : "The Addams Family",
-            "release_year" : 2019
+            "title" : "A Dogs Purpose",
+            "release_year" : 2017
         }
     ];
-    var subtestfour = await GetRequestTestTwo(moviestwo);
-    var subtestfive = await DeleteRequestCollectionTestTwo();
+    setTimeout(() => {GetRequestTestTwo(moviestwo)}, 700);
+
+    setTimeout(() => {DeleteRequestCollectionTestTwo()}, 800);
+
+    //Expected list of movies.
     const moviesthree = [];
-    var subtestsix = await GetRequestTestTwo(moviesthree);
-
-    if(subtestone === true &&
-        subtesttwo === true &&
-        subtestthree === true &&
-        subtestfour === true &&
-        subtestfive === true &&
-        subtestsix === true){
-            console.log("TEST TWO SUCCESSFUL!");
-        }
+    setTimeout(() => {GetRequestTestTwo(moviesthree)}, 900);
 }
-
 
 //PUT request with axios
 //Returns true if response matches UPDATE COLLECTION SUCCESSFUL.
 async function PutRequestTestTwo(collection){
-    var requeststatus = await axios.put('http://localhost:3000/api/', collection
+    await axios.put('http://localhost:3000/api/', collection
     ).then(function(response){
         //console.log(response.data);
         responsestring = response.data.toString();
         if(responsestring === 'REPLACE COLLECTION SUCCESSFUL'){
-            return true;
+         VerifyTest(true, '4');
         }else{
-            return false;
+         VerifyTest(false, '4');
         }
     }).catch(function(error){
         console.log(error);
-        return false;
     });
-
-    return requeststatus;
 }
 
 //GET request with axios
 //Returns true expectedcollection matches actual collection.
 async function GetRequestTestTwo(expectedcollection){
     var request = axios.get('http://localhost:3000/api/')
-    .then(async function(response){
-        console.log(response.data)
+    .then(function(response){
+        //console.log(response.data)
         return response;
     })
     .catch((error) => console.log(error));
 
-
-    console.log(request);
-
     var collection = null;
-    var resolvepromise = await request.then((request) => {return request})
+    await request.then((request) => {return request})
     .then((value)=> {return value.data})
     .then(function(value){
         //console.log(value);
         collection = value;
     });
+    //console.log(collection);
 
-    console.log(collection);
-
-    var expected = true;
     if(expectedcollection.length > 0){
         for (let i = 0; i < collection.length; i++) {
+            //console.log(collection[i].title);
+            //console.log(expectedcollection[i].title);
             if(collection[i].title != expectedcollection[i].title){
-                expected = false;
+             VerifyTest(false, '5');
                 break;
             }
         }
     }else{
         if(collection.length != 0){
-            expected = false;
+         VerifyTest(false, '5');
         }
     }
-    return expected;
 }
 
-
-//DELETE request with axios
+//DELETE by id request with axios
 //Returns true if response matches DELETE ITEM SUCCESSFUL.
 function DeleteRequestByIdTestTwo(id){
-    var requeststatus = axios.delete('http://localhost:3000/api/' + id.toString() + '/')
+    //console.log('Deleting item')
+    axios.delete('http://localhost:3000/api/' + id.toString() + '/')
     .then(function(response){
         //console.log(response);
         if(response.data === 'DELETE ITEM SUCCESSFUL'){
-            return true;
+         VerifyTest(true, '6');
         }else{
-            return false;
+         VerifyTest(false, '6');
         }
     }).catch(function(error){
         console.log(error);
     });
-    return requeststatus;
 }
 
-
-//DELETE request with axios
+//DELETE collection request with axios
 //Returns true if response matches DELETE COLLECTION SUCCESSFUL.
 function DeleteRequestCollectionTestTwo(){
-    var requeststatus = axios.delete('http://localhost:3000/api/').then(function(response){
+    //console.log('Deleting collection')
+    axios.delete('http://localhost:3000/api/')
+    .then(function(response){
         if(response.data === 'DELETE COLLECTION SUCCESSFUL'){
-            return true;
+         VerifyTest(true, '7');
         }else{
-            return false;
+         VerifyTest(false, '7');
         }
-    }).catch(function(error){
+    })
+    .catch(function(error){
         console.log(error);
     });
-    return requeststatus;
 }
 
-
+//Function runs test one and test two.
 async function RunAllTest(){
     await TestOne();
-    await TestTwo();
+    setTimeout(()=> TestTwo(), 1000);
 }
 
+//Call back for test state. True is a pass/False is a fail.
+function VerifyTest(state, location){
+    if(state === false){
+        testpass = state;
+        testlocation = location;
+    }
+}
+
+//Returns the test result (Pass/Fail).
+function GetTestResult(){
+    if(testpass === true){
+        console.log("ALL TEST SUCCESSFUL")
+    }else{
+        console.log("TESTS HAVE FAILED AT TEST " + testlocation)
+    }
+}
+
+
 RunAllTest();
+setTimeout(() => GetTestResult(), 3000);
